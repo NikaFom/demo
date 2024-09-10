@@ -43,7 +43,7 @@ public class CarService {
     public CarInfoResponse updateCar(Long id, CarInfoRequest request) {
         CarEntity car = getCarFromDB(id);
 
-        car.setBrand(request.getBrand() == null ? car.getBrand() : request.getBrand());
+        car.setBrand(request.getBrand());
         car.setModel(request.getModel() == null ? car.getModel() : request.getModel());
         car.setYear(request.getYear() == null ? car.getYear() : request.getYear());
         car.setDoors(request.getDoors() == null ? car.getDoors() : request.getDoors());
