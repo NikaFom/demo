@@ -17,14 +17,10 @@ import javax.validation.constraints.NotNull;
 public class UserInfoRequest {
     @NotEmpty
     String email;
-    @NotEmpty
     String password;
-    @NotEmpty
     String firstName;
-    @NotEmpty
     String lastName;
     String middleName;
-    @NotNull
     Integer age;
     Gender gender;
 }

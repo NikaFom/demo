@@ -17,8 +17,7 @@ import javax.validation.constraints.NotNull;
 public class CarInfoRequest {
     @NotEmpty
     String brand;
-    String type;
-    @NotNull
+    String model;
     Integer year;
     Integer doors;
     Double capacity;
