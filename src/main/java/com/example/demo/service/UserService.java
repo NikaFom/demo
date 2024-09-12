@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.model.db.entity.CarEntity;
 import com.example.demo.model.db.entity.UserEntity;
 import com.example.demo.model.db.repository.UserRepository;
 import com.example.demo.model.dto.request.UserInfoRequest;
+import com.example.demo.model.dto.response.CarInfoResponse;
 import com.example.demo.model.dto.response.UserInfoResponse;
 import com.example.demo.model.enums.UserStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +44,7 @@ public class UserService {
     }
 
     public UserEntity getUserFromDB(Long id){
-        return userRepository.findById(id).orElse(new UserEntity());
+        return userRepository.findById(id).orElse(null);
     }
 
     public UserInfoResponse updateUser(Long id, UserInfoRequest request) {
@@ -79,5 +81,9 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(userEntity -> mapper.convertValue(userEntity, UserInfoResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    public UserEntity updateUserData(UserEntity user) {
+        return userRepository.save(user);
     }
 }

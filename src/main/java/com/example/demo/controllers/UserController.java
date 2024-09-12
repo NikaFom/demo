@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.model.dto.request.UserInfoRequest;
+import com.example.demo.model.dto.response.CarInfoResponse;
 import com.example.demo.model.dto.response.UserInfoResponse;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

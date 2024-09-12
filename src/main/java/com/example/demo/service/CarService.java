@@ -1,13 +1,21 @@
 package com.example.demo.service;
 
 import com.example.demo.model.db.entity.CarEntity;
+import com.example.demo.model.db.entity.UserEntity;
 import com.example.demo.model.db.repository.CarRepository;
+import com.example.demo.model.db.repository.UserRepository;
 import com.example.demo.model.dto.request.CarInfoRequest;
+import com.example.demo.model.dto.request.CarToUserRequest;
 import com.example.demo.model.dto.response.CarInfoResponse;
 import com.example.demo.model.enums.CarStatus;
+import com.example.demo.utils.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,8 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CarService {
+    private final UserService userService;
     private final ObjectMapper mapper;
     private final CarRepository carRepository;
+    private final UserRepository userRepository;
 
     public CarInfoResponse createCar(CarInfoRequest request) {
         CarEntity car = mapper.convertValue(request, CarEntity.class);
@@ -67,8 +77,43 @@ public class CarService {
         carRepository.save(car);
     }
 
-    public List<CarInfoResponse> getAllCars() {
-        return carRepository.findAll().stream()
+    public Page<CarInfoResponse> getAllCars(Integer page, Integer perPage, String sort, Sort.Direction order, String filter) {
+        Pageable pageRequest = PaginationUtil.getPageRequest(page, perPage, sort, order);
+
+        Page<CarEntity> all = carRepository.findAllByStatusNot((java.awt.print.Pageable) pageRequest, CarStatus.DELETED);
+
+        List<CarInfoResponse> content = all.getContent().stream()
+                .map(carEntity -> mapper.convertValue(carEntity, CarInfoResponse.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(content, pageRequest, all.getTotalElements());
+    }
+
+    public void addCarToUser(CarToUserRequest request) {
+        CarEntity car = carRepository.findById(request.getCarId()).orElse(null);
+        if(car == null) {
+            return;
+        }
+
+        UserEntity user = userService.getUserFromDB(request.getUserId());
+        if(user == null) {
+            return;
+        }
+
+        user.getCars().add(car);
+        userService.updateUserData(user);
+
+        car.setUser(user);
+        carRepository.save(car);
+    }
+
+    public List<CarInfoResponse> getUserCars(Long userId) {
+        UserEntity user = userService.getUserFromDB(userId);
+        if(user == null) {
+            return null;
+        }
+
+        return user.getCars().stream()
                 .map(carEntity -> mapper.convertValue(carEntity, CarInfoResponse.class))
                 .collect(Collectors.toList());
     }
